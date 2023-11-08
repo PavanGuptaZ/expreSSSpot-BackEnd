@@ -6,10 +6,6 @@ const commentSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
     },
-    name: {
-        type: String,
-        required: true,
-    },
     commentPostId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -18,11 +14,9 @@ const commentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
     },
-    title: {
-        type: String,
-        require: true,
-        maxLength: 100,
-        minLength: 5
+    commentOwner: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
     },
     content: {
         type: String,

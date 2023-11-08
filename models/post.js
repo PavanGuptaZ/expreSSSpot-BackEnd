@@ -6,10 +6,6 @@ const postSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
     },
-    name: {
-        type: String,
-        required: true,
-    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

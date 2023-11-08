@@ -9,4 +9,7 @@ router.route('/:commentPostId')
     .get(commentsController.getAllCommentsOfPosts)
     .post(commentsController.postCommentsOfPosts)
 
+router.route('/:commentId')
+    .delete(commentsController.deleteACommentOfPosts)
+
 module.exports = router

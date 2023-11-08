@@ -13,6 +13,13 @@ const userSchema = new mongoose.Schema({
     },
     name: {
         type: String,
+        default: "ExpressEnthusiast",
+        require: true
+    },
+    description: {
+        type: String,
+        default: "Passionate about all things express - news, opinions, and updates. Join me in exploring the world of expediency at expreSSSpot!",
+        require: true,
     },
     following: {
         type: Array,
@@ -37,6 +44,10 @@ const userSchema = new mongoose.Schema({
     bookmark: {
         type: Array,
         default: [],
+    },
+    profilePic: {
+        type: String,
+        default: "profile_pic.png"
     }
 }, { timestamps: true })
 
