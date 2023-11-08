@@ -29,11 +29,11 @@ app.use(cors(corsOptions))
 
 connectDb()
 app.use((_req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://expressspot.netlify.app/');
-    res.header('Access-Control-Allow-Headers', '*');
-  
+    res.set('Access-Control-Allow-Origin', 'https://expressspot.netlify.app/');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
     next();
-  });
+});
 app.use("/", Home)
 
 app.use("/auth", Auth)
