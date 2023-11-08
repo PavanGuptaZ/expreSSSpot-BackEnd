@@ -28,7 +28,12 @@ app.use(cookieParser())
 app.use(cors(corsOptions))
 
 connectDb()
-
+app.use((_req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://expressspot.netlify.app/');
+    res.header('Access-Control-Allow-Headers', '*');
+  
+    next();
+  });
 app.use("/", Home)
 
 app.use("/auth", Auth)
