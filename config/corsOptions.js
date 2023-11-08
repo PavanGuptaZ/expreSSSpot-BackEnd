@@ -9,6 +9,7 @@ const corsOptions = {
         }
     },
     credentials: true,
+    methods: ["GET", "POST", "DELETE", "PATCH"],
     optionsSuccessStatus: 200
 }
 
