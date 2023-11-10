@@ -1,4 +1,4 @@
 const allowedOrigins = [
-    'https://expressspot.netlify.app/',
+    'https://expressspot.netlify.app',
 ]
 module.exports = allowedOrigins
