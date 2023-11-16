@@ -5,8 +5,8 @@ const asyncHandler = require('express-async-handler')
 const mongoose = require('mongoose')
 const fs = require('fs')
 
-//@desc Get all users
-//@route GET / users
+//@desc Get all posts users
+//@route GET / posts
 //@access Private
 const getAllPosts = asyncHandler(async (req, res) => {
     let { _id } = req.user
@@ -17,6 +17,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
     res.status(200).json(posts)
 })
 
+//@desc Get all posts of a users
+//@route GET / posts
+//@access Private
 const getAllPostOfUsers = asyncHandler(async (req, res) => {
     let { id } = req.params
 
@@ -36,6 +39,9 @@ const getAllPostOfUsers = asyncHandler(async (req, res) => {
     res.status(200).json(posts)
 })
 
+//@desc Get a post
+//@route GET / posts
+//@access Private
 const getSpecificPostById = asyncHandler(async (req, res) => {
     const { id } = req.params
 
@@ -55,24 +61,29 @@ const getSpecificPostById = asyncHandler(async (req, res) => {
     res.status(200).json({ ...post, name: user.name })
 })
 
-//@desc Get all liked by users
-//@route GET / users
+//@desc Get all liked by user
+//@route GET / posts
 //@access Private
 const getAllLikedByUsers = asyncHandler(async (req, res) => {
-    let { _id } = req.user
-    const posts = await PostModal.find({ userId: _id })
+    let { likedPosts } = req.user
+
+    const posts = await PostModal.find({ _id: { $in: likedPosts } })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
     res.status(200).json(posts)
 })
 
-//@desc Get all liked by users
-//@route GET / users
+//@desc Get all commented posts by user
+//@route GET / posts
 //@access Private
 const getAllCommentedByUsers = asyncHandler(async (req, res) => {
     let { _id } = req.user
-    const posts = await PostModal.find({ userId: _id })
+
+    const postsIds = await CommentModal.find({ commentUserId: _id }).select({ commentPostId: 1, _id: 0 }).lean()
+    const postIdsArray = postsIds.map(item => item.commentPostId)
+
+    const posts = await PostModal.find({ _id: { $in: postIdsArray } })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
@@ -80,19 +91,20 @@ const getAllCommentedByUsers = asyncHandler(async (req, res) => {
 })
 
 //@desc Get all liked by users
-//@route GET / users
+//@route GET / posts
 //@access Private
 const getAllBookmarkedByUsers = asyncHandler(async (req, res) => {
-    let { _id } = req.user
-    const posts = await PostModal.find({ userId: _id })
+    let { bookmarks } = req.user
+
+    const posts = await PostModal.find({ _id: { $in: bookmarks } })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
     res.status(200).json(posts)
 })
 
-//@desc Create all users
-//@route POST / users
+//@desc Create new post
+//@route POST / posts
 //@access Private
 const createNewPost = asyncHandler(async (req, res) => {
     let { _id } = req.user
@@ -115,7 +127,7 @@ const createNewPost = asyncHandler(async (req, res) => {
     const userPost = { email, userId, title, text, image }
 
     const post = await PostModal.create(userPost)
-    console.log(post)
+
     if (post) {
         res.status(200).json({ post: post, message: `New Post ${title} created` })
     } else {
@@ -123,8 +135,9 @@ const createNewPost = asyncHandler(async (req, res) => {
     }
 })
 
-//@desc update a users
-//@route PATCH / users
+//                                  ****incompleted****
+//@desc update a post
+//@route PATCH / posts
 //@access Private
 const updatePost = asyncHandler(async (req, res) => {
     const { _id, email, password, name, following, followingBy, blockedUsers, blockedBy } = req.body
@@ -142,8 +155,74 @@ const updatePost = asyncHandler(async (req, res) => {
 
 })
 
+//@desc update like for a post
+//@route PATCH / posts
+//@access Private
+const likePost = asyncHandler(async (req, res) => {
+    let postId = req.params.postid
+    const { _id, likedPosts } = req.user
+
+    if (!postId) {
+        return res.status(400).json({ message: 'Post ID required' })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        return res.status(400).json({ message: 'Wrong Post Id, please check Try Again' })
+    }
+
+    const post = await PostModal.findOne({ _id: postId })
+    if (!post) {
+        return res.status(400).json({ message: 'No Post in this Id' })
+    }
+    let { likedBy } = post
+
+    if (likedPosts.includes(postId) || likedBy.includes(_id)) {
+        await UserModal.updateOne({ _id }, { $pull: { likedPosts: postId } });
+        await PostModal.updateOne({ _id: postId }, { $pull: { likedBy: _id } });
+
+        return res.status(200).json({ message: 'Post unliked successfully' })
+    } else {
+        await UserModal.updateOne({ _id }, { $addToSet: { likedPosts: postId } })
+        await PostModal.updateOne({ _id: postId }, { $addToSet: { likedBy: _id } })
+
+        res.status(200).json({ message: 'Post liked successfully' });
+    }
+})
+
+//@desc update Bookmark a post
+//@route PATCH / posts
+//@access Private
+const bookmarkThePost = asyncHandler(async (req, res) => {
+    let postId = req.params.postid
+    let { _id, bookmarks } = req.user
+
+    if (!postId) {
+        return res.status(400).json({ message: 'Post ID required' })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        return res.status(400).json({ message: 'Wrong Post Id, please check Try Again' })
+    }
+
+    const post = await PostModal.findOne({ _id: postId })
+    if (!post) {
+        return res.status(400).json({ message: 'No Post in this Id' })
+    }
+
+    if (bookmarks.includes(postId)) {
+        await UserModal.updateOne({ _id }, { $pull: { bookmarks: postId } });
+
+        return res.status(200).json({ message: 'Post unliked successfully' })
+    } else {
+        await UserModal.updateOne({ _id }, { $addToSet: { bookmarks: postId } })
+
+        res.status(200).json({ message: 'Post liked successfully' });
+    }
+
+})
+
 //@desc delete a users
-//@route DELETE / users
+//@route DELETE / posts
 //@access Private
 const deletePost = asyncHandler(async (req, res) => {
     const { _id, userId } = req.body
@@ -180,5 +259,7 @@ module.exports = {
     getAllBookmarkedByUsers,
     createNewPost,
     updatePost,
+    likePost,
+    bookmarkThePost,
     deletePost
 }

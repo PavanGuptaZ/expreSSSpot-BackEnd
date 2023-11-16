@@ -20,4 +20,7 @@ router.get('/comments', postsController.getAllCommentedByUsers)
 router.get('/bookmarks', postsController.getAllBookmarkedByUsers)
 router.get('/:id', postsController.getSpecificPostById)
 
+router.patch('/like/:postid', postsController.likePost)
+router.patch('/bookmark/:postid', postsController.bookmarkThePost)
+
 module.exports = router

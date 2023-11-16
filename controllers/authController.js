@@ -65,7 +65,7 @@ const logout = (req, res) => {
 
     if (!cookie?.jwt) return res.status(404).json({ status: 'error', message: "Logout Successfully no code" })
     res.clearCookie('jwt')
-    // res.set("Access-Control-Allow-Origins", { ...allowedOrigins })
+
     res.status(200).json({ status: 'error', message: "Logout Successfully" })
 }
 

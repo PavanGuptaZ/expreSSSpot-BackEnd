@@ -37,11 +37,11 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
-    likedPost: {
+    likedPosts: {
         type: Array,
         default: [],
     },
-    bookmark: {
+    bookmarks: {
         type: Array,
         default: [],
     },
