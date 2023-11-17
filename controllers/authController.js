@@ -63,8 +63,12 @@ const refresh = (req, res) => {
 const logout = (req, res) => {
     const cookie = req.cookies
 
-    if (!cookie?.jwt) return res.status(404).json({ status: 'error', message: "Logout Successfully no code" })
-    res.clearCookie('jwt')
+    if (!cookie?.jwt) return res.status(204).json({ status: 'error', message: "Logout Successfully no code" })
+    res.clearCookie('jwt', {
+        httpOnly: true,
+        sameSite: 'None',
+        secure: true,
+    })
 
     res.status(200).json({ status: 'error', message: "Logout Successfully" })
 }
