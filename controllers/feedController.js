@@ -88,9 +88,9 @@ const newFeedAll = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "no posts are found" })
     }
     if (totalPosts > perPage) {
-        posts = await PostModal.find().sort({ updatedAt: -1 }).skip((page - 1) * perPage).limit(perPage).lean()
+        posts = await PostModal.find().sort({ createdAt: -1 }).skip((page - 1) * perPage).limit(perPage).lean()
     } else {
-        posts = await PostModal.find().sort({ updatedAt: -1 }).lean()
+        posts = await PostModal.find().sort({ createdAt: -1 }).lean()
     }
     const usersIds = posts.map((post) => post.userId)
     const users = await UserModal.find({ _id: usersIds }).select({ name: 1 }).lean()
@@ -120,9 +120,9 @@ const followingFeedAll = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "no posts are found" })
     }
     if (totalPosts > perPage) {
-        posts = await PostModal.find({ userId: { $in: following } }).sort({ updatedAt: -1 }).skip((page - 1) * perPage).limit(perPage).lean()
+        posts = await PostModal.find({ userId: { $in: following } }).sort({ createdAt: -1 }).skip((page - 1) * perPage).limit(perPage).lean()
     } else {
-        posts = await PostModal.find({ userId: { $in: following } }).sort({ updatedAt: -1 }).lean()
+        posts = await PostModal.find({ userId: { $in: following } }).sort({ createdAt: -1 }).lean()
     }
     const usersIds = posts.map((post) => post.userId)
     const users = await UserModal.find({ _id: usersIds }).select({ name: 1 }).lean()

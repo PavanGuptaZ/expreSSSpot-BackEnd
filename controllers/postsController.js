@@ -10,7 +10,7 @@ const fs = require('fs')
 //@access Private
 const getAllPosts = asyncHandler(async (req, res) => {
     let { _id } = req.user
-    const posts = await PostModal.find({ userId: _id })
+    const posts = await PostModal.find({ userId: _id }).sort({ createdAt: -1 })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
@@ -32,7 +32,7 @@ const getAllPostOfUsers = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'User not Found' })
     }
 
-    const posts = await PostModal.find({ userId: id })
+    const posts = await PostModal.find({ userId: id }).sort({ createdAt: -1 })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
@@ -67,7 +67,7 @@ const getSpecificPostById = asyncHandler(async (req, res) => {
 const getAllLikedByUsers = asyncHandler(async (req, res) => {
     let { likedPosts } = req.user
 
-    const posts = await PostModal.find({ _id: { $in: likedPosts } })
+    const posts = await PostModal.find({ _id: { $in: likedPosts } }).sort({ createdAt: -1 })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
@@ -83,7 +83,7 @@ const getAllCommentedByUsers = asyncHandler(async (req, res) => {
     const postsIds = await CommentModal.find({ commentUserId: _id }).select({ commentPostId: 1, _id: 0 }).lean()
     const postIdsArray = postsIds.map(item => item.commentPostId)
 
-    const posts = await PostModal.find({ _id: { $in: postIdsArray } })
+    const posts = await PostModal.find({ _id: { $in: postIdsArray } }).sort({ createdAt: -1 })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
@@ -96,7 +96,7 @@ const getAllCommentedByUsers = asyncHandler(async (req, res) => {
 const getAllBookmarkedByUsers = asyncHandler(async (req, res) => {
     let { bookmarks } = req.user
 
-    const posts = await PostModal.find({ _id: { $in: bookmarks } })
+    const posts = await PostModal.find({ _id: { $in: bookmarks } }).sort({ createdAt: -1 })
     if (!posts?.length) {
         return res.status(400).json({ message: 'No Post Found' })
     }
